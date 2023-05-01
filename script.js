@@ -12,123 +12,88 @@ const mainDisplay = document.querySelector("#mainDisplay");
 //? should these variables be looped over somehow?
 let numOne = 0;
 let numTwo = 0;
-let realNum1 = parseInt(numOne);
-let realNum2 = parseInt(numTwo);
-let operator = "";
+
+let addOperator = "";
 let operationPending = false;
+let numArr = [];
+
+addBtn.addEventListener("click", add);
+
+operateBtn.addEventListener("click", operate);
+
+resetButton.addEventListener("click", reset);
 
 //? let the following function only return a number and hanle the logic elsewhere
 function numberBtn() {
   numberButtons.forEach((button) => {
     return button.addEventListener("click", () => {
       const number = button.innerHTML;
-      const actualNumber = parseInt(number);
-
-      if (!operationPending) {
-        mainDisplay.value += actualNumber;
-      } else if (numOne !== 0 && mainDisplay.value !== "") {
-        operationPending = false;
-        mainDisplay.value = "";
-        mainDisplay.value += actualNumber;
-      }
-
-      //console.log(mainDisplay.value, numOne, operator, numTwo);
-      return actualNumber;
+      display(number);
     });
   });
 }
 numberBtn();
 
-addBtn.addEventListener("click", () => {
-  add();
-});
+function updateArr() {
+  numArr = [numOne, numTwo];
+  console.log(numArr);
+}
 
-operateBtn.addEventListener("click", () => {
-  operate();
-});
+//* display
+function display(number) {
+  if (!operationPending) {
+    mainDisplay.value += number;
+  } else if (numOne !== 0 && mainDisplay.value !== "") {
+    operationPending = false;
+    mainDisplay.value = "";
+    mainDisplay.value += number;
+  }
+}
 
-resetButton.addEventListener("click", reset);
+function storeNumbers() {
+  const parsedNum = parseInt(mainDisplay.value);
+  if (numOne === 0) {
+    numOne = parsedNum;
+    console.log(numOne, typeof numOne);
+  } else if (numOne !== 0) {
+    numTwo = parsedNum;
+    console.log(numTwo, typeof numTwo);
+  }
+  return parsedNum;
+}
 
-function display(actualNumber) {}
-
-// the operator button takes the number value in the display and stores it in a global variable or array
-// operate(storedNumA, storedNumB)
-// function operate(...args) {arrayFrom(args)}
-
-function add(a, b, actualNumber) {
-  operator = "add";
+//* add
+function add() {
+  addOperator = "add";
   operationPending = true;
 
-  if (numOne === 0) {
-    numOne = mainDisplay.value;
-  } else if (numOne !== 0) {
-    numTwo = mainDisplay.value;
-  }
-
-  console.log(operationPending);
-  console.log(numOne, numTwo)
-  return (sum = a + b);
-}
-
-//subtract
-function subtract(a, b) {
-  return a - b;
-}
-
-//multiply
-function multiply(a, b) {
-  return a * b;
-}
-
-//divide
-function divide(a, b) {
-  return a / b;
+  storeNumbers();
+  updateArr();
 }
 
 function reset() {
   mainDisplay.value = "";
   numOne = 0;
   numTwo = 0;
-  operate = "";
-  let operationPending = false;
+  addOperator = "";
+  operationPending = false;
 }
+const addNumbs = (a, b) => a + b;
 
 //do the thing
 function operate() {
-  numTwo = mainDisplay.value;
+  let sum;
 
-  let realNum1 = parseInt(numOne);
-  let realNum2 = parseInt(numTwo);
-
-  let sum = 0;
-  operationPending = false;
-
-  if ((operate = "add" && numOne > 0 && numTwo > 0)) {
-    sum = add(realNum1, realNum2);
+  if (addOperator === "add") {
+    storeNumbers();
+    updateArr();
+    const sum = numArr.reduce(addNumbs);
     mainDisplay.value = sum;
-
-    numOne = sum;
+    const parsedSum = parseInt(mainDisplay.value);
+    numOne = parsedSum;
     numTwo = 0;
-
-    console.log(`${realNum1} + ${realNum2} = ${sum}`);
-    console.log(`numOne set to sum: ${sum}, numTwo set to ${numTwo}`);
-
-    operationPending = false;
-    console.log(operationPending);
+    console.log(`sum: ${sum}!, ${typeof sum}`);
+    console.log(`numOne changed to sum: ${sum}`);
   }
-  return sum;
+  operationPending = false;
 }
-
-//number buttons are displayed in the input field and stored somewhere (array/variable) when an operator is clicked.
-
-/* addBtn.addEventListener("click", () => {
-  add();
-});
-
-subtractBtn.addEventListener("click", subtract);
-multiplyBtn.addEventListener("click", multiply);
-divideBtn.addEventListener("click", divide);
-operateBtn.addEventListener("click", operate);
-resetBtn.addEventListener("click", reset); */
-
-//add
