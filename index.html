@@ -8,26 +8,42 @@
     <title>Calculator</title>
   </head>
   <body>
-    <h1>Calcmylater</h1>
-    <input type="text" value="" id="calcDisplay" disabled/> <br />
-    <input type="text" value="" id="mainDisplay" disabled/> <br />
-    <button id="numberButton">1</button>
-    <button id="numberButton">2</button>
-    <button id="numberButton">3</button>
-    <button id="numberButton">4</button>
-    <button id="numberButton">5</button>
-    <button id="numberButton">6</button>
-    <button id="numberButton">7</button>
-    <button id="numberButton">8</button>
-    <button id="numberButton">9</button>
-    <button id="numberButton">0</button><br />
-
-    <button id="addbtn">+</button>
-    <button id="subtractBtn">-</button>
-    <button id="multiplyBtn">*</button>
-    <button id="divideBtn">/</button>
-    <button id="operateBtn">=</button>
-    <button id="resetButton">Reset</button>
+    <main>
+      <h1>Calculator</h1>
+      <div class="calculator">
+        <div class="calculator-grid-container">
+          <div class="displayContainer">
+            <!--             <input  type="text" value="" id="calcDisplay" disabled /> -->
+            <input
+              class="main-display"
+              type="text"
+              value=""
+              id="mainDisplay"
+              disabled
+            />
+          </div>
+          <button id="resetButton">AC</button>
+          <button id="deleteButton">del</button>
+          <button id="remainderButton">%</button>
+          <button id="addbtn">+</button>
+          <button id="numberButton">1</button>
+          <button id="numberButton">2</button>
+          <button id="numberButton">3</button>
+          <button id="subtractBtn">-</button>
+          <button id="numberButton">4</button>
+          <button id="numberButton">5</button>
+          <button id="numberButton">6</button>
+          <button id="multiplyBtn">*</button>
+          <button id="numberButton">7</button>
+          <button id="numberButton">8</button>
+          <button id="numberButton">9</button>
+          <button id="divideBtn">/</button>
+          <button id="numberButton">0</button>
+          <button id="integerButton">.</button>
+          <button id="operateBtn">=</button>
+        </div>
+      </div>
+    </main>
     <script src="script.js"></script>
   </body>
 </html>
