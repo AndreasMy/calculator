@@ -8,15 +8,14 @@ const operateBtn = document.querySelector("#operateBtn");
 const resetButton = document.querySelector("#resetButton");
 const mainDisplay = document.querySelector("#mainDisplay");
 
-// variables for updating display
 let numOne = 0;
 let numTwo = 0;
+let numArr = [];
 
 let operatorState = "";
 let operationPending = false;
-let numArr = [];
 
-//* Buttons!
+//* Buttons
 addBtn.addEventListener("click", add);
 operateBtn.addEventListener("click", operate);
 resetButton.addEventListener("click", reset);
@@ -24,20 +23,38 @@ subtractBtn.addEventListener("click", subtract);
 multiplyBtn.addEventListener("click", multiply);
 divideBtn.addEventListener("click", divide);
 
+function numberBtn() {
+  numberButtons.forEach((button) => {
+    return button.addEventListener("click", () => {
+      const number = button.innerHTML;
+      if(operationPending === false && operatorState === "evaluated") {
+        reset()
+        display(number);
+      } else {
+        display(number);
+      } 
+    });
+  });
+}
+
+//* operations for the reduce() method used in operate()
+const addNums = (a, b) => a + b;
+const subtractNums = (a, b) => a - b;
+const multiplyNums = (a, b) => a * b;
+const divideNums = (a, b) => a / b;
+
+//* variables for updating display. Also used in numArr
+
+//TODO: Display should have numeric value from the getgo
+//TODO opeation buttons calls the operate function when appropriate
+//TODO those other buttons: del, % and .
+//TODO empty display outputs 0 by default
+
 function init() {
   numberBtn();
   updateArr();
 }
 init();
-
-function numberBtn() {
-  numberButtons.forEach((button) => {
-    return button.addEventListener("click", () => {
-      const number = button.innerHTML;
-      display(number);
-    });
-  });
-}
 
 function updateArr() {
   numArr = [numOne, numTwo];
@@ -111,6 +128,7 @@ function reset() {
   mainDisplay.value = "";
   numOne = 0;
   numTwo = 0;
+  updateArr();
   operatorState = "";
   operationPending = false;
   console.table(
@@ -122,58 +140,40 @@ function reset() {
     operationPending
   );
 }
-const addNums = (a, b) => a + b;
-const subtractNums = (a, b) => a - b;
-const multiplyNums = (a, b) => a * b;
-const divideNums = (a, b) => a / b;
 
 //do the thing
 function operate() {
   let sum;
+  storeNumbers();
+  updateArr();
 
-  if (operatorState === "add") {
-    storeNumbers();
-    updateArr();
-
-    const sum = numArr.reduce(addNums);
-
-    mainDisplay.value = sum;
-    const parsedSum = parseInt(mainDisplay.value);
-    numOne = parsedSum;
-    console.log(`numOne changed to sum: ${sum}`);
-  } else if (operatorState === "subtract") {
-    storeNumbers();
-    updateArr();
-
-    const sum = numArr.reduce(subtractNums);
-
-    mainDisplay.value = sum;
-    const parsedSum = parseInt(mainDisplay.value);
-    numOne = parsedSum;
-    console.log(`numOne changed to sum: ${sum}`);
-  } else if (operatorState === "multiply") {
-    storeNumbers();
-    updateArr();
-
-    const sum = numArr.reduce(multiplyNums);
-
-    mainDisplay.value = sum;
-    const parsedSum = parseInt(mainDisplay.value);
-    numOne = parsedSum;
-    console.log(`numOne changed to sum: ${sum}`);
-  } else if (operatorState === "divide") {
-    storeNumbers();
-    updateArr();
-
-    const sum = numArr.reduce(divideNums);
-
-    mainDisplay.value = sum;
-    const parsedSum = parseInt(mainDisplay.value);
-    numOne = parsedSum;
-    console.log(`numOne changed to sum: ${sum}`);
+  switch (operatorState) {
+    case "add":
+      mainDisplay.value = numArr.reduce(addNums);
+      break;
+    case "subtract":
+      mainDisplay.value = numArr.reduce(subtractNums);
+      break;
+    case "multiply":
+      mainDisplay.value = numArr.reduce(multiplyNums);
+      break;
+    case "divide":
+      mainDisplay.value = numArr.reduce(divideNums);
+      break;
   }
 
-  operatorState = "";
+  const parsedSum = parseInt(mainDisplay.value);
+
+  switch (parsedSum) {
+    case 0:
+      reset();
+      break;
+  }
+
+  numOne = parsedSum;
+  console.log(`numOne changed to sum: ${mainDisplay.value}`);
+
+  operatorState = "evaluated";
   operationPending = false;
   console.log(operatorState);
 }
