@@ -5,6 +5,7 @@ const operateBtn = document.querySelector("#operateBtn");
 const resetButton = document.querySelector("#resetButton");
 
 const mainDisplay = document.querySelector("#mainDisplay");
+const calcDisplay = document.querySelector("#calcDisplay");
 
 //* Buttons
 operateBtn.addEventListener("click", operate);
@@ -20,7 +21,7 @@ const divideNums = (a, b) => a / b;
 let numOne = 0;
 let numTwo = 0;
 let numArr = [];
-
+let displayOperator = "";
 let operatorState = "";
 let operationPending = false;
 
@@ -55,13 +56,25 @@ function operatorButtons() {
       const operatorBtn = button.innerHTML;
 
       operatorState = operatorBtn;
+      displayOperator = operatorState;
       operationPending = true;
 
       storeNumbers();
       updateArr();
+      displayCalculation();
       console.log(operatorState);
     });
   });
+}
+
+function displayCalculation() {
+  calcDisplay.value = numOne;
+  calcDisplay.value += ` ${displayOperator} `;
+
+  if (operatorState === "evaluated") {
+    calcDisplay.value += numTwo;
+    calcDisplay.value += ` = `;
+  }
 }
 
 //* output
@@ -89,6 +102,9 @@ function storeNumbers() {
   return parsedNum;
 }
 
+//? what if I can use the value of the upper display to perform the operations? will it simpilify the code by a lot?
+//? operate() then stores the values in an array, parseInt() and store their values to their respective variables
+
 //TODO I should be able to enter an operator from default state and operate on it. This might change the code quite a bit.
 //? it might be helpful to have the numbers and operations stored in the other display?
 //TODO opeation buttons calls the operate function when appropriate
@@ -101,10 +117,12 @@ function updateArr() {
 
 function resetDisplay() {
   mainDisplay.value = "";
+  calcDisplay.value = "";
 }
 
 function reset() {
   mainDisplay.value = "";
+  calcDisplay.value = "";
   numOne = 0;
   numTwo = 0;
   updateArr();
@@ -133,7 +151,7 @@ function operate() {
     case "-":
       mainDisplay.value = numArr.reduce(subtractNums);
       break;
-    case "*":
+    case "x":
       mainDisplay.value = numArr.reduce(multiplyNums);
       break;
     case "/":
@@ -153,6 +171,7 @@ function operate() {
   console.log(`numOne changed to sum: ${mainDisplay.value}`);
 
   operatorState = "evaluated";
+  displayCalculation();
   operationPending = false;
   console.log(operatorState);
 }
