@@ -5,7 +5,7 @@ html {
 body {
   min-width: 100%;
   min-height: 100vh;
-  background-color: rgb(51, 56, 56);
+  background-color: rgb(32, 35, 39);
 }
 
 main {
@@ -25,7 +25,7 @@ h1 {
   justify-content: center;
   width: 350px;
   height: 500px;
-  background-color: rgb(102, 124, 96);
+  background-color: rgb(96, 122, 124);
 }
 
 .displayContainer {
@@ -36,14 +36,22 @@ h1 {
 }
 
 button {
-  padding: 22px;
+  padding: 21px;
   border-radius: 6px;
   border-style: none;
   font-size: 1.2rem;
 }
 
-.operator-btn {
-  background-color: rgb(241, 207, 163);
+.delete-btn,
+.reset-btn {
+  background-color: rgb(233, 89, 132);
+}
+
+.operator-btn,
+#operateBtn {
+  font-size: 1.3rem;
+  background-color: rgb(87, 185, 202);
+  color: rgb(94, 0, 28);
 }
 
 .main-display {
@@ -61,7 +69,7 @@ button {
   gap: 8px;
 }
 
-#operateBtn {
+.zero-btn {
   grid-row: 6 / 6;
-  grid-column: 3 / span 2;
+  grid-column: 1 / span 2;
 }

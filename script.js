@@ -1,41 +1,14 @@
 const numberButtons = document.querySelectorAll("#numberButton");
-const addBtn = document.querySelector("#addbtn");
-const subtractBtn = document.querySelector("#subtractBtn");
-const multiplyBtn = document.querySelector("#multiplyBtn");
-const divideBtn = document.querySelector("#divideBtn");
-const operateBtn = document.querySelector("#operateBtn");
+const operatorButton = document.querySelectorAll(".operator-btn");
 
+const operateBtn = document.querySelector("#operateBtn");
 const resetButton = document.querySelector("#resetButton");
+
 const mainDisplay = document.querySelector("#mainDisplay");
 
-let numOne = 0;
-let numTwo = 0;
-let numArr = [];
-
-let operatorState = "";
-let operationPending = false;
-
 //* Buttons
-addBtn.addEventListener("click", add);
 operateBtn.addEventListener("click", operate);
 resetButton.addEventListener("click", reset);
-subtractBtn.addEventListener("click", subtract);
-multiplyBtn.addEventListener("click", multiply);
-divideBtn.addEventListener("click", divide);
-
-function numberBtn() {
-  numberButtons.forEach((button) => {
-    return button.addEventListener("click", () => {
-      const number = button.innerHTML;
-      if(operationPending === false && operatorState === "evaluated") {
-        reset()
-        display(number);
-      } else {
-        display(number);
-      } 
-    });
-  });
-}
 
 //* operations for the reduce() method used in operate()
 const addNums = (a, b) => a + b;
@@ -44,33 +17,62 @@ const multiplyNums = (a, b) => a * b;
 const divideNums = (a, b) => a / b;
 
 //* variables for updating display. Also used in numArr
+let numOne = 0;
+let numTwo = 0;
+let numArr = [];
 
-//TODO: Display should have numeric value from the getgo
-//TODO opeation buttons calls the operate function when appropriate
-//TODO those other buttons: del, % and .
-//TODO empty display outputs 0 by default
+let operatorState = "";
+let operationPending = false;
 
 function init() {
   numberBtn();
+  operatorButtons();
   updateArr();
 }
 init();
 
-function updateArr() {
-  numArr = [numOne, numTwo];
-  console.log({ numOne, numTwo });
+function numberBtn() {
+  numberButtons.forEach((button) => {
+    return button.addEventListener("click", () => {
+      const number = button.innerHTML;
+      if (operationPending === false && operatorState === "evaluated") {
+        resetDisplay();
+        operatorState = "";
+        numOne = 0;
+        output(number);
+      } else if (operationPending === false && operatorState !== "") {
+        output(number);
+      } else {
+        output(number);
+      }
+    });
+  });
 }
 
-//* display
-function display(number) {
-  if (!operationPending) {
+function operatorButtons() {
+  operatorButton.forEach((button) => {
+    return button.addEventListener("click", () => {
+      const operatorBtn = button.innerHTML;
+
+      operatorState = operatorBtn;
+      operationPending = true;
+
+      storeNumbers();
+      updateArr();
+      console.log(operatorState);
+    });
+  });
+}
+
+//* output
+function output(number) {
+  if (operationPending === false) {
     mainDisplay.value += number;
   } else if (numOne !== 0 && mainDisplay.value !== "") {
     operationPending = false;
     mainDisplay.value = "";
     mainDisplay.value += number;
   }
-  console.log(operatorState);
 }
 
 function storeNumbers() {
@@ -87,41 +89,18 @@ function storeNumbers() {
   return parsedNum;
 }
 
-//* add
-function add() {
-  operatorState = "add";
-  operationPending = true;
+//TODO I should be able to enter an operator from default state and operate on it. This might change the code quite a bit.
+//? it might be helpful to have the numbers and operations stored in the other display?
+//TODO opeation buttons calls the operate function when appropriate
+//TODO those other buttons: del, % and .
 
-  storeNumbers();
-  updateArr();
-  console.log(operatorState);
+function updateArr() {
+  numArr = [numOne, numTwo];
+  console.log({ numOne, numTwo });
 }
 
-function subtract() {
-  operatorState = "subtract";
-  operationPending = true;
-
-  storeNumbers();
-  updateArr();
-  console.log(operatorState);
-}
-
-function multiply() {
-  operatorState = "multiply";
-  operationPending = true;
-
-  storeNumbers();
-  updateArr();
-  console.log(operatorState);
-}
-
-function divide() {
-  operatorState = "divide";
-  operationPending = true;
-
-  storeNumbers();
-  updateArr();
-  console.log(operatorState);
+function resetDisplay() {
+  mainDisplay.value = "";
 }
 
 function reset() {
@@ -148,16 +127,16 @@ function operate() {
   updateArr();
 
   switch (operatorState) {
-    case "add":
+    case "+":
       mainDisplay.value = numArr.reduce(addNums);
       break;
-    case "subtract":
+    case "-":
       mainDisplay.value = numArr.reduce(subtractNums);
       break;
-    case "multiply":
+    case "*":
       mainDisplay.value = numArr.reduce(multiplyNums);
       break;
-    case "divide":
+    case "/":
       mainDisplay.value = numArr.reduce(divideNums);
       break;
   }
@@ -166,7 +145,7 @@ function operate() {
 
   switch (parsedSum) {
     case 0:
-      reset();
+      resetDisplay();
       break;
   }
 
