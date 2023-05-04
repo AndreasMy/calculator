@@ -1,9 +1,15 @@
+//? what if I can use the value of the upper display to perform the operations? will it simpilify the code by a lot?
+//? operate() then stores the values in an array, parseInt() and store their values to their respective variables
+
+//TODO I should be able to enter an operator from default state and operate on it. This might change the code quite a bit.
+//? it might be helpful to have the numbers and operations stored in the other display?
+//TODO opeation buttons calls the operate function when appropriate
+//TODO those other buttons: del, % and .
+
 const numberButtons = document.querySelectorAll("#numberButton");
 const operatorButton = document.querySelectorAll(".operator-btn");
-
 const operateBtn = document.querySelector("#operateBtn");
 const resetButton = document.querySelector("#resetButton");
-
 const mainDisplay = document.querySelector("#mainDisplay");
 const calcDisplay = document.querySelector("#calcDisplay");
 
@@ -18,12 +24,14 @@ const multiplyNums = (a, b) => a * b;
 const divideNums = (a, b) => a / b;
 
 //* variables for updating display. Also used in numArr
+let sum = 0;
 let numOne = 0;
 let numTwo = 0;
 let numArr = [];
 let displayOperator = "";
 let operatorState = "";
 let operationPending = false;
+let parsedNum = parseInt(mainDisplay.value);
 
 function init() {
   numberBtn();
@@ -50,10 +58,15 @@ function numberBtn() {
   });
 }
 
-function operatorButtons() {
+function operatorButtons(parsedNum) {
   operatorButton.forEach((button) => {
     return button.addEventListener("click", () => {
       const operatorBtn = button.innerHTML;
+      parsedNum = parseInt(mainDisplay.value);
+
+      if (operatorState === "evaluated") {
+        numOne = parsedNum;
+      }
 
       operatorState = operatorBtn;
       displayOperator = operatorState;
@@ -68,6 +81,10 @@ function operatorButtons() {
 }
 
 function displayCalculation() {
+  if (operatorState === "evaluated") {
+    calcDisplay.value = sum;
+  }
+
   calcDisplay.value = numOne;
   calcDisplay.value += ` ${displayOperator} `;
 
@@ -89,7 +106,12 @@ function output(number) {
 }
 
 function storeNumbers() {
-  const parsedNum = parseInt(mainDisplay.value);
+  parsedNum = parseInt(mainDisplay.value);
+
+  if (operatorState === "evaluated") {
+    numOne = sum;
+  }
+
   if (numOne !== 0 && numTwo !== 0) {
     numTwo = 0;
   } else if (numOne === 0) {
@@ -101,14 +123,6 @@ function storeNumbers() {
   }
   return parsedNum;
 }
-
-//? what if I can use the value of the upper display to perform the operations? will it simpilify the code by a lot?
-//? operate() then stores the values in an array, parseInt() and store their values to their respective variables
-
-//TODO I should be able to enter an operator from default state and operate on it. This might change the code quite a bit.
-//? it might be helpful to have the numbers and operations stored in the other display?
-//TODO opeation buttons calls the operate function when appropriate
-//TODO those other buttons: del, % and .
 
 function updateArr() {
   numArr = [numOne, numTwo];
@@ -140,7 +154,6 @@ function reset() {
 
 //do the thing
 function operate() {
-  let sum;
   storeNumbers();
   updateArr();
 
@@ -167,8 +180,8 @@ function operate() {
       break;
   }
 
-  numOne = parsedSum;
-  console.log(`numOne changed to sum: ${mainDisplay.value}`);
+  //numOne = parsedSum;
+  //console.log(`numOne changed to sum: ${mainDisplay.value}`);
 
   operatorState = "evaluated";
   displayCalculation();
