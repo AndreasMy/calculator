@@ -44,6 +44,7 @@ function numberBtn() {
   numberButtons.forEach((button) => {
     return button.addEventListener("click", () => {
       const number = button.innerHTML;
+
       if (operationPending === false && operatorState === "evaluated") {
         resetDisplay();
         operatorState = "";
@@ -58,11 +59,15 @@ function numberBtn() {
   });
 }
 
-function operatorButtons(parsedNum) {
+function operatorButtons() {
   operatorButton.forEach((button) => {
     return button.addEventListener("click", () => {
       const operatorBtn = button.innerHTML;
-      parsedNum = parseInt(mainDisplay.value);
+
+      if (operatorState !== "evaluate" && operatorState !== "") {
+        operatorState === "evaluated";
+        operate();
+      }
 
       if (operatorState === "evaluated") {
         numOne = parsedNum;
@@ -75,7 +80,7 @@ function operatorButtons(parsedNum) {
       storeNumbers();
       updateArr();
       displayCalculation();
-      console.log(operatorState);
+      console.log(operatorState, operationPending);
     });
   });
 }
@@ -110,10 +115,8 @@ function storeNumbers() {
 
   if (operatorState === "evaluated") {
     numOne = sum;
-  }
-
-  if (numOne !== 0 && numTwo !== 0) {
-    numTwo = 0;
+  } else if (numOne !== 0 && numTwo !== 0) {
+    numTwo = parsedNum;
   } else if (numOne === 0) {
     numOne = parsedNum;
     console.log(numOne, typeof numOne);
@@ -187,4 +190,5 @@ function operate() {
   displayCalculation();
   operationPending = false;
   console.log(operatorState);
+  return parsedSum;
 }
