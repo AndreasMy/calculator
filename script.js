@@ -8,55 +8,71 @@
 
 const numberButtons = document.querySelectorAll("#numberButton");
 const operatorButton = document.querySelectorAll(".operator-btn");
-const operateBtn = document.querySelector("#operateBtn");
+const equalButton = document.querySelector("#equalButton");
 const resetButton = document.querySelector("#resetButton");
 const mainDisplay = document.querySelector("#mainDisplay");
 const calcDisplay = document.querySelector("#calcDisplay");
 
 //* Buttons
-operateBtn.addEventListener("click", operate);
+equalButton.addEventListener("click", operate);
 resetButton.addEventListener("click", reset);
 
-//* operations for the reduce() method used in operate()
-const addNums = (a, b) => a + b;
-const subtractNums = (a, b) => a - b;
-const multiplyNums = (a, b) => a * b;
-const divideNums = (a, b) => a / b;
-
-//* variables for updating display. Also used in numArr
-let sum = 0;
-let numOne = 0;
-let numTwo = 0;
-let numArr = [];
+//* variables for updating display. Also used in numberArray
+let parsedResult = null;
+let numOne = null;
+let numTwo = null;
+let numberArray = [];
+let chosenOperator = "";
 let displayOperator = "";
-let operatorState = "";
+let nextOperation = false;
+let calculated = false;
 let operationPending = false;
-let parsedNum = parseInt(mainDisplay.value);
+let resetByNumKey = false;
+
+let numParsedFromInput = parseInt(mainDisplay.value);
 
 function init() {
-  numberBtn();
+  numberButton();
   operatorButtons();
   updateArr();
 }
 init();
 
-function numberBtn() {
+function numberButton() {
   numberButtons.forEach((button) => {
     return button.addEventListener("click", () => {
       const number = button.innerHTML;
-
-      if (operationPending === false && operatorState === "evaluated") {
+      calculated = false;
+      //* if a pair of numbers have been calculated, clear the display and reset the first number and operator
+      if (operationPending === false && calculated === true) {
         resetDisplay();
-        operatorState = "";
-        numOne = 0;
+        chosenOperator = null;
+        numOne = null;
         output(number);
-      } else if (operationPending === false && operatorState !== "") {
+        console.log(`oh no ${number}`);
+      } else if (operationPending === false && chosenOperator === "") {
+        output(number);
+      } else if (nextOperation === true) {
         output(number);
       } else {
         output(number);
+        console.log(number);
       }
     });
   });
+}
+
+function handleOperation(operatorBtn) {
+  chosenOperator = operatorBtn;
+  displayOperator = chosenOperator;
+
+  operationPending = true;
+
+  storeNumbers();
+  updateArr();
+  displayCalculation();
+  console.log(chosenOperator);
+  console.log(`operation pending: ${operationPending}`);
 }
 
 function operatorButtons() {
@@ -64,46 +80,42 @@ function operatorButtons() {
     return button.addEventListener("click", () => {
       const operatorBtn = button.innerHTML;
 
-      if (operatorState !== "evaluate" && operatorState !== "") {
-        operatorState === "evaluated";
+      if (calculated === false && chosenOperator !== "") {
         operate();
+        numOne = numParsedFromInput;
+        handleOperation(operatorBtn);
+        console.log(`calculated: ${calculated}`);
+      } else if (chosenOperator === "" && calculated === true) {
+        nextOperation = true;
+        handleOperation(operatorBtn);
+        console.log(`next operation: ${nextOperation}`);
+      } else {
+        handleOperation(operatorBtn);
       }
-
-      if (operatorState === "evaluated") {
-        numOne = parsedNum;
-      }
-
-      operatorState = operatorBtn;
-      displayOperator = operatorState;
-      operationPending = true;
-
-      storeNumbers();
-      updateArr();
-      displayCalculation();
-      console.log(operatorState, operationPending);
     });
   });
 }
 
 function displayCalculation() {
-  if (operatorState === "evaluated") {
-    calcDisplay.value = sum;
-  }
-
-  calcDisplay.value = numOne;
-  calcDisplay.value += ` ${displayOperator} `;
-
-  if (operatorState === "evaluated") {
-    calcDisplay.value += numTwo;
-    calcDisplay.value += ` = `;
+  if (operationPending === true) {
+    calcDisplay.value = `${numOne} ${displayOperator} `;
+  } else if (calculated === true) {
+    calcDisplay.value = `${numOne} ${displayOperator} ${numTwo} =`;
+    mainDisplay.value = parsedResult;
+  } else if (nextOperation === true) {
+    calcDisplay.value = `${parsedResult} ${displayOperator} `;
+    mainDisplay.value = "";
+    console.log(`sum: ${parsedResult}`);
   }
 }
 
-//* output
+//* outputs and updates the numbers while they are being clicked
 function output(number) {
   if (operationPending === false) {
     mainDisplay.value += number;
-  } else if (numOne !== 0 && mainDisplay.value !== "") {
+
+    console.log(`calculated: ${calculated}`);
+  } else if (numOne !== null && mainDisplay.value !== "") {
     operationPending = false;
     mainDisplay.value = "";
     mainDisplay.value += number;
@@ -111,24 +123,27 @@ function output(number) {
 }
 
 function storeNumbers() {
-  parsedNum = parseInt(mainDisplay.value);
+  numParsedFromInput = parseInt(mainDisplay.value);
 
-  if (operatorState === "evaluated") {
-    numOne = sum;
-  } else if (numOne !== 0 && numTwo !== 0) {
-    numTwo = parsedNum;
-  } else if (numOne === 0) {
-    numOne = parsedNum;
+  if (nextOperation === true) {
+    numOne = parsedResult;
+    numTwo = numParsedFromInput;
+    //numTwo = null;
+    console.log(parsedResult);
+  } else if (numOne !== null && numTwo !== null) {
+    numTwo = numParsedFromInput;
+  } else if (numOne === null) {
+    numOne = numParsedFromInput;
     console.log(numOne, typeof numOne);
-  } else if (numOne !== 0) {
-    numTwo = parsedNum;
+  } else if (numOne !== null) {
+    numTwo = numParsedFromInput;
     console.log(numTwo, typeof numTwo);
   }
-  return parsedNum;
+  return numParsedFromInput;
 }
 
 function updateArr() {
-  numArr = [numOne, numTwo];
+  numberArray = [numOne, numTwo];
   console.log({ numOne, numTwo });
 }
 
@@ -140,17 +155,19 @@ function resetDisplay() {
 function reset() {
   mainDisplay.value = "";
   calcDisplay.value = "";
-  numOne = 0;
-  numTwo = 0;
+  numOne = null;
+  numTwo = null;
   updateArr();
-  operatorState = "";
+  chosenOperator = "";
+  nextOperation = false;
   operationPending = false;
+  calculated = false;
   console.table(
     mainDisplay.value,
     numOne,
     numTwo,
-    numArr,
-    operatorState,
+    numberArray,
+    chosenOperator,
     operationPending
   );
 }
@@ -160,35 +177,42 @@ function operate() {
   storeNumbers();
   updateArr();
 
-  switch (operatorState) {
+  switch (chosenOperator) {
     case "+":
-      mainDisplay.value = numArr.reduce(addNums);
+      result = numOne + numTwo;
+      displayCalculation();
       break;
     case "-":
-      mainDisplay.value = numArr.reduce(subtractNums);
+      result = numOne - numTwo;
+      displayCalculation();
       break;
     case "x":
-      mainDisplay.value = numArr.reduce(multiplyNums);
+      result = numOne * numTwo;
+      displayCalculation();
       break;
     case "/":
-      mainDisplay.value = numArr.reduce(divideNums);
+      result = numOne / numTwo;
+      displayCalculation();
       break;
   }
 
-  const parsedSum = parseInt(mainDisplay.value);
+  parsedResult = parseInt(result);
 
-  switch (parsedSum) {
+  switch (parsedResult) {
     case 0:
       resetDisplay();
       break;
   }
 
-  //numOne = parsedSum;
-  //console.log(`numOne changed to sum: ${mainDisplay.value}`);
-
-  operatorState = "evaluated";
+  //numOne = parsedResult;
+  chosenOperator = "";
+  calculated = true;
   displayCalculation();
   operationPending = false;
-  console.log(operatorState);
-  return parsedSum;
+  resetByNumKey = true;
+
+  console.log(`numOne changed to sum: ${parsedResult}`);
+  console.log(`calculated: ${calculated}`);
+  console.log(`operation pending: ${operationPending}`);
+  return parsedResult;
 }
