@@ -1,11 +1,3 @@
-//? what if I can use the value of the upper display to perform the operations? will it simpilify the code by a lot?
-//? operate() then stores the values in an array, parseInt() and store their values to their respective variables
-
-//TODO I should be able to enter an operator from default state and operate on it. This might change the code quite a bit.
-//? it might be helpful to have the numbers and operations stored in the other display?
-//TODO opeation buttons calls the operate function when appropriate
-//TODO those other buttons: del, % and .
-
 const numberButtons = document.querySelectorAll("#numberButton");
 const operatorButton = document.querySelectorAll(".operator-btn");
 const equalButton = document.querySelector("#equalButton");
@@ -17,7 +9,7 @@ const calcDisplay = document.querySelector("#calcDisplay");
 equalButton.addEventListener("click", operate);
 resetButton.addEventListener("click", reset);
 
-//* variables for updating display. Also used in numberArray
+//* Good God...
 let parsedResult = null;
 let numOne = null;
 let numTwo = null;
@@ -44,15 +36,16 @@ function numberButton() {
       const number = button.innerHTML;
       calculated = false;
       //* if a pair of numbers have been calculated, clear the display and reset the first number and operator
-      if (operationPending === false && calculated === true) {
+      if (operationPending === false && resetByNumKey === true) {
         resetDisplay();
-        chosenOperator = null;
+        resetByNumKey = false;
+        //chosenOperator = null;
         numOne = null;
         output(number);
         console.log(`oh no ${number}`);
       } else if (operationPending === false && chosenOperator === "") {
         output(number);
-      } else if (nextOperation === true) {
+      } else if (nextOperation === true && operationPending === false) {
         output(number);
       } else {
         output(number);
@@ -79,7 +72,7 @@ function operatorButtons() {
   operatorButton.forEach((button) => {
     return button.addEventListener("click", () => {
       const operatorBtn = button.innerHTML;
-
+      resetByNumKey = false;
       if (calculated === false && chosenOperator !== "") {
         operate();
         numOne = numParsedFromInput;
@@ -95,6 +88,9 @@ function operatorButtons() {
     });
   });
 }
+
+//? activate separate function when operator is pressed consecutively
+
 
 function displayCalculation() {
   if (operationPending === true) {
@@ -115,7 +111,7 @@ function output(number) {
     mainDisplay.value += number;
 
     console.log(`calculated: ${calculated}`);
-  } else if (numOne !== null && mainDisplay.value !== "") {
+  } else if (resetByNumKey === false && mainDisplay.value !== "") {
     operationPending = false;
     mainDisplay.value = "";
     mainDisplay.value += number;
