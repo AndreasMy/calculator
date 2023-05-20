@@ -6,10 +6,13 @@ const mainDisplay = document.querySelector("#mainDisplay");
 const calcDisplay = document.querySelector("#calcDisplay");
 
 //* Buttons
-equalButton.addEventListener("click", operate);
+equalButton.addEventListener("click", () => {
+  operate();
+});
 resetButton.addEventListener("click", reset);
 
 //* Good God...
+let result = null;
 let parsedResult = null;
 let numOne = null;
 let numTwo = null;
@@ -74,10 +77,13 @@ function operatorButtons() {
       const operatorBtn = button.innerHTML;
       resetByNumKey = false;
       if (calculated === false && chosenOperator !== "") {
-        operate();
+        calculate();
+        storeNumbers();
+        updateArr();
         numOne = numParsedFromInput;
         handleOperation(operatorBtn);
         console.log(`calculated: ${calculated}`);
+        console.log("consecutive");
       } else if (chosenOperator === "" && calculated === true) {
         nextOperation = true;
         handleOperation(operatorBtn);
@@ -90,7 +96,7 @@ function operatorButtons() {
 }
 
 //? activate separate function when operator is pressed consecutively
-
+//? or introduce yet another if statement that complicates everything even more
 
 function displayCalculation() {
   if (operationPending === true) {
@@ -126,12 +132,12 @@ function storeNumbers() {
     numTwo = numParsedFromInput;
     //numTwo = null;
     console.log(parsedResult);
-  } else if (numOne !== null && numTwo !== null) {
+  } else if (numOne !== null && numTwo !== null && calculated === false) {
     numTwo = numParsedFromInput;
   } else if (numOne === null) {
     numOne = numParsedFromInput;
     console.log(numOne, typeof numOne);
-  } else if (numOne !== null) {
+  } else if (numOne !== null && calculated === false) {
     numTwo = numParsedFromInput;
     console.log(numTwo, typeof numTwo);
   }
@@ -168,11 +174,7 @@ function reset() {
   );
 }
 
-//do the thing
-function operate() {
-  storeNumbers();
-  updateArr();
-
+function calculate() {
   switch (chosenOperator) {
     case "+":
       result = numOne + numTwo;
@@ -199,6 +201,13 @@ function operate() {
       resetDisplay();
       break;
   }
+}
+
+//do the thing
+function operate() {
+  storeNumbers();
+  updateArr();
+  calculate();
 
   //numOne = parsedResult;
   chosenOperator = "";
