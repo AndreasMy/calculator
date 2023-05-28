@@ -5,219 +5,161 @@ const resetButton = document.querySelector("#resetButton");
 const mainDisplay = document.querySelector("#mainDisplay");
 const calcDisplay = document.querySelector("#calcDisplay");
 
+let num1 = null;
+let num2 = null;
+let sum = null;
+let operateCount = 0;
+let currentState = "";
+let currentValue = "";
+let chosenOperator = "";
+let previousOperator = "";
+
 //* Buttons
 equalButton.addEventListener("click", () => {
   operate();
 });
 resetButton.addEventListener("click", reset);
 
-//* Good God...
-let result = null;
-let parsedResult = null;
-let numOne = null;
-let numTwo = null;
-let numberArray = [];
-let chosenOperator = "";
-let displayOperator = "";
-let nextOperation = false;
-let calculated = false;
-let operationPending = false;
-let resetByNumKey = false;
-
-let numParsedFromInput = parseInt(mainDisplay.value);
-
-function init() {
-  numberButton();
-  operatorButtons();
-  updateArr();
-}
-init();
-
 function numberButton() {
   numberButtons.forEach((button) => {
     return button.addEventListener("click", () => {
-      const number = button.innerHTML;
-      calculated = false;
-      //* if a pair of numbers have been calculated, clear the display and reset the first number and operator
-      if (operationPending === false && resetByNumKey === true) {
-        resetDisplay();
-        resetByNumKey = false;
-        //chosenOperator = null;
-        numOne = null;
-        output(number);
-        console.log(`oh no ${number}`);
-      } else if (operationPending === false && chosenOperator === "") {
-        output(number);
-      } else if (nextOperation === true && operationPending === false) {
-        output(number);
-      } else {
-        output(number);
-        console.log(number);
-      }
+      number = button.innerHTML;
+      setCurrentValue(number);
+      handleNumberInput(number);
     });
   });
-}
-
-function handleOperation(operatorBtn) {
-  chosenOperator = operatorBtn;
-  displayOperator = chosenOperator;
-
-  operationPending = true;
-
-  storeNumbers();
-  updateArr();
-  displayCalculation();
-  console.log(chosenOperator);
-  console.log(`operation pending: ${operationPending}`);
 }
 
 function operatorButtons() {
   operatorButton.forEach((button) => {
     return button.addEventListener("click", () => {
-      const operatorBtn = button.innerHTML;
-      resetByNumKey = false;
-      if (calculated === false && chosenOperator !== "") {
-        calculate();
-        storeNumbers();
-        updateArr();
-        numOne = numParsedFromInput;
-        handleOperation(operatorBtn);
-        console.log(`calculated: ${calculated}`);
-        console.log("consecutive");
-      } else if (chosenOperator === "" && calculated === true) {
-        nextOperation = true;
-        handleOperation(operatorBtn);
-        console.log(`next operation: ${nextOperation}`);
-      } else {
-        handleOperation(operatorBtn);
-      }
+      previousOperator = chosenOperator;
+      chosenOperator = button.innerHTML;
+      operatorCounter();
+      setState();
+      currentValue = "";
+      console.log(previousOperator, chosenOperator);
     });
   });
 }
 
-//? activate separate function when operator is pressed consecutively
-//? or introduce yet another if statement that complicates everything even more
+function setCurrentValue(number) {
+  currentValue += number;
+  console.log(currentValue);
+}
 
-function displayCalculation() {
-  if (operationPending === true) {
-    calcDisplay.value = `${numOne} ${displayOperator} `;
-  } else if (calculated === true) {
-    calcDisplay.value = `${numOne} ${displayOperator} ${numTwo} =`;
-    mainDisplay.value = parsedResult;
-  } else if (nextOperation === true) {
-    calcDisplay.value = `${parsedResult} ${displayOperator} `;
-    mainDisplay.value = "";
-    console.log(`sum: ${parsedResult}`);
+function inputNumOne() {
+  num1 = parseInt(currentValue);
+  console.log(`num1: ${num1}`, typeof num1);
+}
+
+function inputNumTwo() {
+  num2 = parseInt(currentValue);
+  console.log(`num2: ${num2}`, typeof num2);
+}
+
+function handleNumberInput() {
+  if (num2 === null && operateCount < 1) {
+    inputNumOne(number);
+  } else if (num1 !== null || operateCount > 0) {
+    inputNumTwo(number);
   }
 }
 
-//* outputs and updates the numbers while they are being clicked
-function output(number) {
-  if (operationPending === false) {
-    mainDisplay.value += number;
-
-    console.log(`calculated: ${calculated}`);
-  } else if (resetByNumKey === false && mainDisplay.value !== "") {
-    operationPending = false;
-    mainDisplay.value = "";
-    mainDisplay.value += number;
-  }
-}
-
-function storeNumbers() {
-  numParsedFromInput = parseInt(mainDisplay.value);
-
-  if (nextOperation === true) {
-    numOne = parsedResult;
-    numTwo = numParsedFromInput;
-    //numTwo = null;
-    console.log(parsedResult);
-  } else if (numOne !== null && numTwo !== null && calculated === false) {
-    numTwo = numParsedFromInput;
-  } else if (numOne === null) {
-    numOne = numParsedFromInput;
-    console.log(numOne, typeof numOne);
-  } else if (numOne !== null && calculated === false) {
-    numTwo = numParsedFromInput;
-    console.log(numTwo, typeof numTwo);
-  }
-  return numParsedFromInput;
-}
-
-function updateArr() {
-  numberArray = [numOne, numTwo];
-  console.log({ numOne, numTwo });
-}
-
-function resetDisplay() {
-  mainDisplay.value = "";
-  calcDisplay.value = "";
-}
-
-function reset() {
-  mainDisplay.value = "";
-  calcDisplay.value = "";
-  numOne = null;
-  numTwo = null;
-  updateArr();
-  chosenOperator = "";
-  nextOperation = false;
-  operationPending = false;
-  calculated = false;
-  console.table(
-    mainDisplay.value,
-    numOne,
-    numTwo,
-    numberArray,
-    chosenOperator,
-    operationPending
-  );
-}
-
-function calculate() {
-  switch (chosenOperator) {
+function calculate(operator) {
+  switch (operator) {
     case "+":
-      result = numOne + numTwo;
-      displayCalculation();
+      result = num1 + num2;
+      sum = result;
+      console.log(result);
       break;
     case "-":
-      result = numOne - numTwo;
-      displayCalculation();
+      result = num1 - num2;
+      sum = result;
+      console.log(result);
       break;
     case "x":
-      result = numOne * numTwo;
-      displayCalculation();
+      result = num1 * num2;
+      sum = result;
+      console.log(result);
       break;
     case "/":
-      result = numOne / numTwo;
-      displayCalculation();
+      result = num1 / num2;
+      sum = result;
+      console.log(result);
       break;
   }
 
-  parsedResult = parseInt(result);
+  /*   parsedResult = parseInt(result);
 
   switch (parsedResult) {
     case 0:
       resetDisplay();
       break;
+  } */
+}
+
+function operate() {
+  calculate(chosenOperator);
+  chosenOperator = equalButton.innerHTML;
+  console.log(chosenOperator);
+}
+
+function stateConsecutiveOperations() {
+  calculate(previousOperator)
+  keepSum();
+}
+
+function stateOperatedNumbers() {
+  keepSum();
+  operateCount = 0;
+}
+
+function keepSum() {
+  num1 = sum;
+  num2 = null;
+  sum = null;
+}
+
+function reset() {
+  num2 = null;
+  num1 = null;
+  sum = null;
+  operateCount = 0;
+  currentState = "";
+  currentValue = "";
+  chosenOperator = "";
+}
+
+function operatorCounter() {
+  operateCount++;
+  console.log(operateCount);
+}
+
+function setState() {
+  if (operateCount > 1) {
+    currentState = "consecutive";
+    stateManager();
+    console.log(currentState);
+  } else if (chosenOperator === "=") {
+    currentState = "claculated";
+    stateManager();
+    console.log(currentState);
   }
 }
 
-//do the thing
-function operate() {
-  storeNumbers();
-  updateArr();
-  calculate();
-
-  //numOne = parsedResult;
-  chosenOperator = "";
-  calculated = true;
-  displayCalculation();
-  operationPending = false;
-  resetByNumKey = true;
-
-  console.log(`numOne changed to sum: ${parsedResult}`);
-  console.log(`calculated: ${calculated}`);
-  console.log(`operation pending: ${operationPending}`);
-  return parsedResult;
+function stateManager() {
+  if (currentState === "consecutive") {
+    stateConsecutiveOperations();
+  } else if (currentState === "claculated") {
+    stateOperatedNumbers();
+  } else {
+    // moving along
+  }
 }
+
+function init() {
+  numberButton();
+  operatorButtons();
+}
+init();
