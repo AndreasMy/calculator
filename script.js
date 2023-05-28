@@ -17,6 +17,9 @@ let previousOperator = "";
 //* Buttons
 equalButton.addEventListener("click", () => {
   operate();
+  chosenOperator = equalButton.innerHTML;
+  setEvalState();
+  console.log(chosenOperator);
 });
 resetButton.addEventListener("click", reset);
 
@@ -24,8 +27,12 @@ function numberButton() {
   numberButtons.forEach((button) => {
     return button.addEventListener("click", () => {
       number = button.innerHTML;
-      setCurrentValue(number);
-      handleNumberInput(number);
+      if (chosenOperator !== "=") {
+        setCurrentValue(number);
+        handleNumberInput(number);
+      } else {
+        numResetAfterEval();
+      }
     });
   });
 }
@@ -36,7 +43,7 @@ function operatorButtons() {
       previousOperator = chosenOperator;
       chosenOperator = button.innerHTML;
       operatorCounter();
-      setState();
+      setOperatorState();
       currentValue = "";
       console.log(previousOperator, chosenOperator);
     });
@@ -64,6 +71,12 @@ function handleNumberInput() {
   } else if (num1 !== null || operateCount > 0) {
     inputNumTwo(number);
   }
+}
+
+function numResetAfterEval() {
+  reset();
+  setCurrentValue(number);
+  handleNumberInput(number);
 }
 
 function calculate(operator) {
@@ -101,18 +114,19 @@ function calculate(operator) {
 
 function operate() {
   calculate(chosenOperator);
-  chosenOperator = equalButton.innerHTML;
+
   console.log(chosenOperator);
 }
 
 function stateConsecutiveOperations() {
-  calculate(previousOperator)
+  calculate(previousOperator);
   keepSum();
 }
 
 function stateOperatedNumbers() {
   keepSum();
   operateCount = 0;
+  console.log(operateCount);
 }
 
 function keepSum() {
@@ -122,8 +136,8 @@ function keepSum() {
 }
 
 function reset() {
-  num2 = null;
   num1 = null;
+  num2 = null;
   sum = null;
   operateCount = 0;
   currentState = "";
@@ -136,16 +150,20 @@ function operatorCounter() {
   console.log(operateCount);
 }
 
-function setState() {
-  if (operateCount > 1) {
+//? change to handleOperatorState
+//? add setEvalState
+function setOperatorState() {
+  if (operateCount > 1 && chosenOperator !== "=") {
     currentState = "consecutive";
     stateManager();
     console.log(currentState);
-  } else if (chosenOperator === "=") {
-    currentState = "claculated";
-    stateManager();
-    console.log(currentState);
   }
+}
+
+function setEvalState() {
+  currentState = "claculated";
+  stateManager();
+  console.log(currentState);
 }
 
 function stateManager() {
