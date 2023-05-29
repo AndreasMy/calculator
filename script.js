@@ -4,6 +4,7 @@ const equalButton = document.querySelector("#equalButton");
 const resetButton = document.querySelector("#resetButton");
 const mainDisplay = document.querySelector("#mainDisplay");
 const calcDisplay = document.querySelector("#calcDisplay");
+const floatButton = document.querySelector("#floatButton");
 
 let num1 = null;
 let num2 = null;
@@ -17,8 +18,34 @@ let currentState = "";
 let currentValue = "";
 let chosenOperator = "";
 let previousOperator = "";
+let floatButtonClicked = false;
+
+function keepSum() {
+  prevNum1 = num1;
+  prevNum2 = num2;
+  prevSum = sum;
+  num1 = sum;
+  num2 = null;
+  sum = null;
+  console.log(num2);
+}
+
+function reset() {
+  num1 = null;
+  num2 = null;
+  sum = null;
+  operateCount = 0;
+  currentState = "";
+  currentValue = "";
+  chosenOperator = "";
+  mainDisplay.value = "";
+  calcDisplay.value = "";
+  buttonToggle.toggleOn();
+  floatButtonLogic()
+}
 
 //* Buttons
+floatButton.addEventListener("click", handleFloatButton);
 equalButton.addEventListener("click", handleEqualButton);
 resetButton.addEventListener("click", reset);
 
@@ -47,6 +74,7 @@ function handleEqualButton() {
   previousOperator = chosenOperator;
   chosenOperator = equalButton.innerHTML;
   setEvalState();
+  buttonToggle.toggleOn();
   handleDisplayLogic();
   console.log(chosenOperator);
 }
@@ -70,8 +98,131 @@ function handleOperatorButtons() {
   setOperatorState();
   handleDisplayLogic();
   currentValue = "";
+  buttonToggle.toggleOn();
+  floatButtonLogic();
 
   console.log(previousOperator, chosenOperator);
+}
+
+function setCurrentValue(number) {
+  currentValue += number;
+  console.log(currentValue);
+}
+
+function handleNumberInput() {
+  if (num2 === null && operateCount < 1) {
+    num1 = parseFloat(currentValue);
+  } else if (num1 !== null || operateCount > 0) {
+    num2 = parseFloat(currentValue);
+  }
+}
+
+function handleFloatButton() {
+  currentValue += floatButton.innerHTML;
+  buttonToggle.toggleOff();
+  handleDisplayLogic();
+  floatButtonLogic();
+}
+
+function floatButtonLogic() {
+  if (floatButtonClicked === true) {
+    floatButton.disabled = true;
+  } else if (floatButtonClicked === false) {
+    floatButton.disabled = false;
+  }
+}
+
+const buttonToggle = {
+  toggleOff() {
+    floatButtonClicked = true;
+    console.log(`clicked: ${floatButtonClicked}`);
+  },
+
+  toggleOn() {
+    floatButtonClicked = false;
+    console.log(`clicked: ${floatButtonClicked}`);
+  },
+};
+
+function numResetAfterEval() {
+  reset();
+  setCurrentValue(number);
+  handleNumberInput(number);
+  handleDisplayLogic();
+}
+
+function operate() {
+  calculate(chosenOperator);
+  console.log(chosenOperator);
+}
+
+function stateConsecutiveOperations() {
+  calculate(previousOperator);
+  keepSum();
+  currentValue = 0;
+}
+
+function stateOperatedNumbers() {
+  keepSum();
+  operateCount = 0;
+  currentValue = 0;
+  console.log(operateCount);
+}
+
+function operatorCounter() {
+  operateCount++;
+  console.log(operateCount);
+}
+
+function setOperatorState() {
+  if (operateCount > 1 && chosenOperator !== "=") {
+    currentState = "consecutive";
+    stateManager();
+    console.log(currentState);
+  }
+}
+
+function setEvalState() {
+  currentState = "calculated";
+  stateManager();
+  console.log(currentState);
+}
+
+function stateManager() {
+  if (currentState === "consecutive") {
+    stateConsecutiveOperations();
+  } else if (currentState === "calculated") {
+    stateOperatedNumbers();
+  } else {
+    // move along
+  }
+}
+
+function calculate(operator) {
+  switch (operator) {
+    case "+":
+      result = num1 + num2;
+      sum = result;
+      console.log(result);
+      break;
+    case "-":
+      result = num1 - num2;
+      sum = result;
+      console.log(result);
+      break;
+    case "x":
+      result = num1 * num2;
+      sum = result;
+      console.log(result);
+      break;
+    case "/":
+      result = num1 / num2;
+      sum = result;
+      console.log(result);
+      break;
+  }
+  evaluated = true;
+  console.log(`evaluated: ${evaluated}`);
 }
 
 const displayFunctions = {
@@ -81,7 +232,6 @@ const displayFunctions = {
 
   sumMainDisplay() {
     mainDisplay.value = `${prevSum}`;
-    
   },
 
   displayCalculation() {
@@ -118,131 +268,6 @@ function handleDisplayLogic() {
     displayFunctions.inputMainDisplay();
     console.log("case default");
   }
-}
-
-function setCurrentValue(number) {
-  currentValue += number;
-  console.log(currentValue);
-}
-
-function handleNumberInput() {
-  if (num2 === null && operateCount < 1) {
-    num1 = parseInt(currentValue);
-  } else if (num1 !== null || operateCount > 0) {
-    num2 = parseInt(currentValue);
-  }
-}
-
-function numResetAfterEval() {
-  reset();
-  setCurrentValue(number);
-  handleNumberInput(number);
-  handleDisplayLogic();
-}
-
-function operate() {
-  calculate(chosenOperator);
-  console.log(chosenOperator);
-}
-
-function stateConsecutiveOperations() {
-  calculate(previousOperator);
-  keepSum();
-}
-
-function stateOperatedNumbers() {
-  keepSum();
-  operateCount = 0;
-  currentValue = 0;
-  console.log(operateCount);
-}
-
-function keepSum() {
-  prevNum1 = num1;
-  prevNum2 = num2;
-  prevSum = sum;
-  num1 = sum;
-  num2 = null;
-  sum = null;
-  console.log(num2);
-}
-
-function reset() {
-  num1 = null;
-  num2 = null;
-  sum = null;
-  operateCount = 0;
-  currentState = "";
-  currentValue = "";
-  chosenOperator = "";
-  mainDisplay.value = "";
-  calcDisplay.value = "";
-}
-
-function operatorCounter() {
-  operateCount++;
-  console.log(operateCount);
-}
-
-//? change to handleOperatorState
-//? add setEvalState
-function setOperatorState() {
-  if (operateCount > 1 && chosenOperator !== "=") {
-    currentState = "consecutive";
-    stateManager();
-    console.log(currentState);
-  }
-}
-
-function setEvalState() {
-  currentState = "calculated";
-  stateManager();
-  console.log(currentState);
-}
-
-function stateManager() {
-  if (currentState === "consecutive") {
-    stateConsecutiveOperations();
-  } else if (currentState === "calculated") {
-    stateOperatedNumbers();
-  } else {
-    // moving along
-  }
-}
-
-function calculate(operator) {
-  switch (operator) {
-    case "+":
-      result = num1 + num2;
-      sum = result;
-      console.log(result);
-      break;
-    case "-":
-      result = num1 - num2;
-      sum = result;
-      console.log(result);
-      break;
-    case "x":
-      result = num1 * num2;
-      sum = result;
-      console.log(result);
-      break;
-    case "/":
-      result = num1 / num2;
-      sum = result;
-      console.log(result);
-      break;
-  }
-  evaluated = true;
-  console.log(`evaluated: ${evaluated}`);
-
-  /*   parsedResult = parseInt(result);
-
-  switch (parsedResult) {
-    case 0:
-      resetDisplay();
-      break;
-  } */
 }
 
 function init() {
