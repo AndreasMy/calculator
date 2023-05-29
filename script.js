@@ -5,6 +5,7 @@ const resetButton = document.querySelector("#resetButton");
 const mainDisplay = document.querySelector("#mainDisplay");
 const calcDisplay = document.querySelector("#calcDisplay");
 const floatButton = document.querySelector("#floatButton");
+const deleteButton = document.querySelector("#deleteButton");
 
 let num1 = null;
 let num2 = null;
@@ -34,7 +35,7 @@ function keepSum() {
 function reset() {
   num1 = null;
   num2 = null;
-  sum = null;
+  roundedSum = null;
   operateCount = 0;
   currentState = "";
   currentValue = "";
@@ -45,14 +46,15 @@ function reset() {
   floatButtonLogic();
 }
 
-//TODO add backspace functionality
-//TODO round long decimals
 //TODO keyboard support
 
 //* Buttons
 floatButton.addEventListener("click", handleFloatButton);
 equalButton.addEventListener("click", verifyEqualButton);
 resetButton.addEventListener("click", reset);
+deleteButton.addEventListener("click", backspace);
+
+
 
 function numberButton() {
   numberButtons.forEach((button) => {
@@ -131,6 +133,14 @@ function handleNumberInput() {
   } else if (num1 !== null || operateCount > 0) {
     num2 = parseFloat(currentValue);
   }
+}
+
+function backspace() {
+  let input = mainDisplay.value;
+  let modifiedInput = input.slice(0, -1)
+  mainDisplay.value = modifiedInput;
+  currentValue = mainDisplay.value
+  handleNumberInput()
 }
 
 //* Float button logic
@@ -216,7 +226,6 @@ function stateManager() {
 }
 
 function calculate(operator) {
-  let sum;
   switch (operator) {
     case "+":
       sum = num1 + num2;
@@ -230,11 +239,14 @@ function calculate(operator) {
     case "/":
       sum = num1 / num2;
       break;
+    case "%":
+      sum = num1 % num2;
+      break;
   }
   evaluated = true;
   console.log(`evaluated: ${evaluated}`);
 
-  return roundedSum = roundNumbers(sum, 4);
+  return (roundedSum = roundNumbers(sum, 3));
 }
 
 function roundNumbers(value, decimalPlaces) {
