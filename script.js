@@ -19,6 +19,7 @@ let currentValue = "";
 let chosenOperator = "";
 let previousOperator = "";
 let floatButtonClicked = false;
+let oprateButtonClicked = false;
 
 function keepSum() {
   prevNum1 = num1;
@@ -40,13 +41,15 @@ function reset() {
   chosenOperator = "";
   mainDisplay.value = "";
   calcDisplay.value = "";
-  buttonToggle.toggleOn();
-  floatButtonLogic()
+  floatButtonToggle.toggleOn();
+  floatButtonLogic();
 }
 
 //* Buttons
 floatButton.addEventListener("click", handleFloatButton);
-equalButton.addEventListener("click", handleEqualButton);
+
+//?
+equalButton.addEventListener("click", verifyEqualButton);
 resetButton.addEventListener("click", reset);
 
 function numberButton() {
@@ -74,9 +77,20 @@ function handleEqualButton() {
   previousOperator = chosenOperator;
   chosenOperator = equalButton.innerHTML;
   setEvalState();
-  buttonToggle.toggleOn();
+  floatButtonToggle.toggleOn();
   handleDisplayLogic();
   console.log(chosenOperator);
+}
+
+function verifyEqualButton() {
+  if (num2 !== null && chosenOperator !== "") {
+    equalButton.disabled = false;
+    handleEqualButton();
+    console.log("calc 1");
+  } else {
+    equalButton.disabled = false;
+    console.log("calc 2");
+  }
 }
 
 //* Number buttons
@@ -98,7 +112,7 @@ function handleOperatorButtons() {
   setOperatorState();
   handleDisplayLogic();
   currentValue = "";
-  buttonToggle.toggleOn();
+  floatButtonToggle.toggleOn();
   floatButtonLogic();
 
   console.log(previousOperator, chosenOperator);
@@ -117,9 +131,10 @@ function handleNumberInput() {
   }
 }
 
+//* Float button logic
 function handleFloatButton() {
   currentValue += floatButton.innerHTML;
-  buttonToggle.toggleOff();
+  floatButtonToggle.toggleOff();
   handleDisplayLogic();
   floatButtonLogic();
 }
@@ -132,7 +147,7 @@ function floatButtonLogic() {
   }
 }
 
-const buttonToggle = {
+const floatButtonToggle = {
   toggleOff() {
     floatButtonClicked = true;
     console.log(`clicked: ${floatButtonClicked}`);
