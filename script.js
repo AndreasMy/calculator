@@ -45,10 +45,12 @@ function reset() {
   floatButtonLogic();
 }
 
+//TODO add backspace functionality
+//TODO round long decimals
+//TODO keyboard support 
+
 //* Buttons
 floatButton.addEventListener("click", handleFloatButton);
-
-//?
 equalButton.addEventListener("click", verifyEqualButton);
 resetButton.addEventListener("click", reset);
 
