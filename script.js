@@ -12,6 +12,7 @@ let sum = null;
 let prevNum1 = null;
 let prevNum2 = null;
 let prevSum = null;
+let roundedSum = null;
 let evaluated = false;
 let operateCount = 0;
 let currentState = "";
@@ -24,10 +25,9 @@ let oprateButtonClicked = false;
 function keepSum() {
   prevNum1 = num1;
   prevNum2 = num2;
-  prevSum = sum;
-  num1 = sum;
+  prevSum = roundedSum;
+  num1 = roundedSum;
   num2 = null;
-  sum = null;
   console.log(num2);
 }
 
@@ -47,7 +47,7 @@ function reset() {
 
 //TODO add backspace functionality
 //TODO round long decimals
-//TODO keyboard support 
+//TODO keyboard support
 
 //* Buttons
 floatButton.addEventListener("click", handleFloatButton);
@@ -216,30 +216,30 @@ function stateManager() {
 }
 
 function calculate(operator) {
+  let sum;
   switch (operator) {
     case "+":
-      result = num1 + num2;
-      sum = result;
-      console.log(result);
+      sum = num1 + num2;
       break;
     case "-":
-      result = num1 - num2;
-      sum = result;
-      console.log(result);
+      sum = num1 - num2;
       break;
     case "x":
-      result = num1 * num2;
-      sum = result;
-      console.log(result);
+      sum = num1 * num2;
       break;
     case "/":
-      result = num1 / num2;
-      sum = result;
-      console.log(result);
+      sum = num1 / num2;
       break;
   }
   evaluated = true;
   console.log(`evaluated: ${evaluated}`);
+
+  return roundedSum = roundNumbers(sum, 4);
+}
+
+function roundNumbers(value, decimalPlaces) {
+  const factor = 10 ** decimalPlaces;
+  return Math.round(value * factor) / factor;
 }
 
 const displayFunctions = {
