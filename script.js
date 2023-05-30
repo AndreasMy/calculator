@@ -29,7 +29,6 @@ function keepSum() {
   prevSum = roundedSum;
   num1 = roundedSum;
   num2 = null;
-  console.log(num2);
 }
 
 function reset() {
@@ -47,14 +46,13 @@ function reset() {
 }
 
 //TODO keyboard support
+//TODO
 
 //* Buttons
 floatButton.addEventListener("click", handleFloatButton);
 equalButton.addEventListener("click", verifyEqualButton);
 resetButton.addEventListener("click", reset);
 deleteButton.addEventListener("click", backspace);
-
-
 
 function numberButton() {
   numberButtons.forEach((button) => {
@@ -77,7 +75,7 @@ function operatorButtons() {
 
 //* Eval button
 function handleEqualButton() {
-  operate();
+  calculate(chosenOperator);
   previousOperator = chosenOperator;
   chosenOperator = equalButton.innerHTML;
   setEvalState();
@@ -87,13 +85,13 @@ function handleEqualButton() {
 }
 
 function verifyEqualButton() {
-  if (num2 !== null && chosenOperator !== "") {
-    equalButton.disabled = false;
+  if (isNaN(num1) || isNaN(num2)) {
+    return;
+  } else if (num2 !== null && chosenOperator !== "") {
     handleEqualButton();
-    console.log("calc 1");
-  } else {
-    equalButton.disabled = false;
     console.log("calc 2");
+  } else {
+    return;
   }
 }
 
@@ -102,29 +100,34 @@ function handleNumberButton() {
   evaluated = false;
   console.log(`evaluated: ${evaluated}`);
   if (chosenOperator !== "=") {
-    setCurrentValue(number);
+    currentValue += number;
     handleNumberInput(number);
     handleDisplayLogic();
   } else {
-    numResetAfterEval();
+    reset();
+    currentValue += number;
+    handleNumberInput(number);
+    handleDisplayLogic();
   }
 }
 
 //* Operator buttons
+//! operatorCounter should only count actual operations
 function handleOperatorButtons() {
-  operatorCounter();
+  if (num1 === null && num2 === null) {
+    return;
+  } else if (isNaN(num1) || isNaN(num2)) {
+    return;
+  } else if (operateCount === 1 && num2 === null) {
+    return displayFunctions.displayCalculation()
+  }
+
+  operateCount++;
   setOperatorState();
   handleDisplayLogic();
   currentValue = "";
   floatButtonToggle.toggleOn();
   floatButtonLogic();
-
-  console.log(previousOperator, chosenOperator);
-}
-
-function setCurrentValue(number) {
-  currentValue += number;
-  console.log(currentValue);
 }
 
 function handleNumberInput() {
@@ -136,11 +139,17 @@ function handleNumberInput() {
 }
 
 function backspace() {
+  if (mainDisplay.value === "" && calcDisplay.value === "") {
+    return;
+  } else if (currentState === "calculated") {
+    return;
+  }
+
   let input = mainDisplay.value;
-  let modifiedInput = input.slice(0, -1)
+  let modifiedInput = input.slice(0, -1);
   mainDisplay.value = modifiedInput;
-  currentValue = mainDisplay.value
-  handleNumberInput()
+  currentValue = mainDisplay.value;
+  handleNumberInput();
 }
 
 //* Float button logic
@@ -162,26 +171,12 @@ function floatButtonLogic() {
 const floatButtonToggle = {
   toggleOff() {
     floatButtonClicked = true;
-    console.log(`clicked: ${floatButtonClicked}`);
   },
 
   toggleOn() {
     floatButtonClicked = false;
-    console.log(`clicked: ${floatButtonClicked}`);
   },
 };
-
-function numResetAfterEval() {
-  reset();
-  setCurrentValue(number);
-  handleNumberInput(number);
-  handleDisplayLogic();
-}
-
-function operate() {
-  calculate(chosenOperator);
-  console.log(chosenOperator);
-}
 
 function stateConsecutiveOperations() {
   calculate(previousOperator);
@@ -193,11 +188,6 @@ function stateOperatedNumbers() {
   keepSum();
   operateCount = 0;
   currentValue = 0;
-  console.log(operateCount);
-}
-
-function operatorCounter() {
-  operateCount++;
   console.log(operateCount);
 }
 
@@ -244,8 +234,6 @@ function calculate(operator) {
       break;
   }
   evaluated = true;
-  console.log(`evaluated: ${evaluated}`);
-
   return (roundedSum = roundNumbers(sum, 3));
 }
 
@@ -254,6 +242,7 @@ function roundNumbers(value, decimalPlaces) {
   return Math.round(value * factor) / factor;
 }
 
+//* Display logic
 const displayFunctions = {
   inputMainDisplay() {
     mainDisplay.value = `${currentValue}`;
@@ -270,32 +259,54 @@ const displayFunctions = {
   displayFullCalculation() {
     calcDisplay.value = `${prevNum1} ${previousOperator} ${prevNum2} =`;
   },
+
+  displayError() {
+    mainDisplay.value = "Ooops!";
+    calcDisplay.value = "";
+  },
 };
 
 function handleDisplayLogic() {
-  if (chosenOperator === "=") {
-    displayFunctions.sumMainDisplay();
-    displayFunctions.displayFullCalculation();
-    console.log("case 1");
-  } else if (currentState === "consecutive" && num2 === null) {
-    displayFunctions.inputMainDisplay();
-    displayFunctions.displayCalculation();
-    console.log("case 2");
-  } else if (currentState === "consecutive" && evaluated === true) {
-    displayFunctions.sumMainDisplay();
-    displayFunctions.displayFullCalculation();
-    console.log("case 3");
-  } else if (currentState === "" && num1 !== null && chosenOperator !== "") {
-    displayFunctions.inputMainDisplay();
-    displayFunctions.displayCalculation();
-    console.log("case 4");
-  } else if (currentState === "calculated" && chosenOperator !== "") {
-    displayFunctions.displayCalculation();
-    displayFunctions.inputMainDisplay();
-    console.log("case 5");
-  } else {
-    displayFunctions.inputMainDisplay();
-    console.log("case default");
+  switch (true) {
+    case chosenOperator === "=" && sum !== Infinity:
+      displayFunctions.sumMainDisplay();
+      displayFunctions.displayFullCalculation();
+      console.log("case 1");
+      break;
+
+    case currentState === "consecutive" && num2 === null:
+      displayFunctions.inputMainDisplay();
+      displayFunctions.displayCalculation();
+      console.log("case 2");
+      break;
+
+    case currentState === "consecutive" && evaluated === true:
+      displayFunctions.sumMainDisplay();
+      displayFunctions.displayFullCalculation();
+      console.log("case 3");
+      break;
+
+    case currentState === "" && num1 !== null && chosenOperator !== "":
+      displayFunctions.inputMainDisplay();
+      displayFunctions.displayCalculation();
+      console.log("case 4");
+      break;
+
+    case chosenOperator === "=" && sum === Infinity:
+      displayFunctions.displayError();
+      console.log("case 5");
+      break;
+
+    case currentState === "calculated" && chosenOperator !== "":
+      displayFunctions.displayCalculation();
+      displayFunctions.inputMainDisplay();
+      console.log("case 6");
+      break;
+
+    default:
+      displayFunctions.inputMainDisplay();
+      console.log("case default");
+      break;
   }
 }
 
