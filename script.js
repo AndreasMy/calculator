@@ -101,9 +101,9 @@ function handleNumberButton() {
     handleDisplayLogic();
   } else {
     reset();
+    handleDisplayLogic();
     currentValue += number;
     handleNumberInput(number);
-    handleDisplayLogic();
   }
 }
 
@@ -114,7 +114,7 @@ function handleOperatorButtons() {
   } else if (isNaN(num1) || isNaN(num2)) {
     return;
   } else if (operateCount === 1 && num2 === null) {
-    return displayFunctions.displayCalculation()
+    return displayFunctions.displayCalculation();
   }
 
   operateCount++;
@@ -123,6 +123,7 @@ function handleOperatorButtons() {
   currentValue = "";
   floatButtonToggle.toggleOn();
   floatButtonLogic();
+  console.log(num2, operateCount, currentState);
 }
 
 function handleNumberInput() {
@@ -176,13 +177,13 @@ const floatButtonToggle = {
 function stateConsecutiveOperations() {
   calculate(previousOperator);
   keepSum();
-  currentValue = 0;
+  // currentValue = 0;
 }
 
 function stateOperatedNumbers() {
   keepSum();
   operateCount = 0;
-  currentValue = 0;
+  // currentValue = 0;
 }
 
 function setOperatorState() {
@@ -241,7 +242,7 @@ const displayFunctions = {
   },
 
   sumMainDisplay() {
-    mainDisplay.value = `${prevSum}`;
+    mainDisplay.value = `${num1}`;
   },
 
   displayCalculation() {
@@ -253,8 +254,8 @@ const displayFunctions = {
   },
 
   displayError() {
-    mainDisplay.value = "Ooops!";
     calcDisplay.value = "";
+    mainDisplay.value = "Ooops!";
   },
 };
 
@@ -267,14 +268,20 @@ function handleDisplayLogic() {
       break;
 
     case currentState === "consecutive" && num2 === null:
-      displayFunctions.inputMainDisplay();
       displayFunctions.displayCalculation();
+      displayFunctions.sumMainDisplay();
       console.log("case 2");
       break;
 
+    case currentState === "consecutive" && num2 !== null:
+      displayFunctions.displayCalculation();
+      displayFunctions.inputMainDisplay();
+      console.log("case 2.5");
+      break;
+
     case currentState === "consecutive" && evaluated === true:
-      displayFunctions.sumMainDisplay();
       displayFunctions.displayFullCalculation();
+      displayFunctions.sumMainDisplay();
       console.log("case 3");
       break;
 
@@ -289,10 +296,16 @@ function handleDisplayLogic() {
       console.log("case 5");
       break;
 
-    case currentState === "calculated" && chosenOperator !== "":
+    case currentState === "calculated" && num2 !== null:
       displayFunctions.displayCalculation();
       displayFunctions.inputMainDisplay();
       console.log("case 6");
+      break;
+
+    case currentState === "calculated" && chosenOperator !== "":
+      displayFunctions.displayCalculation();
+      displayFunctions.sumMainDisplay();
+      console.log("case 7");
       break;
 
     default:

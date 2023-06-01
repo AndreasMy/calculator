@@ -31,6 +31,9 @@ h1 {
   width: 370px;
   height: 500px;
   background-color: rgb(96, 114, 116);
+  box-shadow: rgba(50, 79, 93, 0.25) 0px 0px 20px 3px inset,
+  rgba(50, 93, 84, 0.25) 0px 0px 20px 3px inset;
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 19px 38px, rgba(0, 0, 0, 0.11) 0px 20px 22px;
 }
 
 .displayContainer {
@@ -43,12 +46,7 @@ button {
   border-radius: 6px;
   border-style: none;
   font-size: 1.2rem;
-  border: 1px solid rgb(96, 122, 124);
   background-color: rgb(241, 236, 224);
-}
-
-button:hover {
-  border: 1px solid white;
 }
 
 button:active {
