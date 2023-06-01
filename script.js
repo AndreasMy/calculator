@@ -46,7 +46,6 @@ function reset() {
 }
 
 //TODO keyboard support
-//TODO
 
 //* Buttons
 floatButton.addEventListener("click", handleFloatButton);
@@ -81,7 +80,6 @@ function handleEqualButton() {
   setEvalState();
   floatButtonToggle.toggleOn();
   handleDisplayLogic();
-  console.log(chosenOperator);
 }
 
 function verifyEqualButton() {
@@ -89,7 +87,6 @@ function verifyEqualButton() {
     return;
   } else if (num2 !== null && chosenOperator !== "") {
     handleEqualButton();
-    console.log("calc 2");
   } else {
     return;
   }
@@ -98,7 +95,6 @@ function verifyEqualButton() {
 //* Number buttons
 function handleNumberButton() {
   evaluated = false;
-  console.log(`evaluated: ${evaluated}`);
   if (chosenOperator !== "=") {
     currentValue += number;
     handleNumberInput(number);
@@ -112,7 +108,6 @@ function handleNumberButton() {
 }
 
 //* Operator buttons
-//! operatorCounter should only count actual operations
 function handleOperatorButtons() {
   if (num1 === null && num2 === null) {
     return;
@@ -141,7 +136,7 @@ function handleNumberInput() {
 function backspace() {
   if (mainDisplay.value === "" && calcDisplay.value === "") {
     return;
-  } else if (currentState === "calculated") {
+  } else if (evaluated === true) {
     return;
   }
 
@@ -188,21 +183,18 @@ function stateOperatedNumbers() {
   keepSum();
   operateCount = 0;
   currentValue = 0;
-  console.log(operateCount);
 }
 
 function setOperatorState() {
   if (operateCount > 1 && chosenOperator !== "=") {
     currentState = "consecutive";
     stateManager();
-    console.log(currentState);
   }
 }
 
 function setEvalState() {
   currentState = "calculated";
   stateManager();
-  console.log(currentState);
 }
 
 function stateManager() {
